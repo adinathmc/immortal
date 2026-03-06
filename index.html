@@ -2,29 +2,251 @@
 <html>
 
 <head>
-  <meta charset="utf-8" />
-  <title>Young Innovators STEM Lab</title>
-  <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
+    <title>Jackyboi Chat Environment</title>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script
+        src="https://unpkg.com/aframe-environment-component@1.3.3/dist/aframe-environment-component.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.2.0/dist/aframe-extras.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Chat Container Overlay */
+        #chat-container {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            width: 320px;
+            height: 450px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        /* Chat Header */
+        #chat-header {
+            background: #4f46e5;
+            color: white;
+            padding: 12px 15px;
+            font-weight: bold;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        /* Chat Messages Area */
+        #chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Individual Messages */
+        .message {
+            padding: 10px 14px;
+            border-radius: 18px;
+            max-width: 80%;
+            word-wrap: break-word;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .user-message {
+            background: #4f46e5;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bot-message {
+            background: #f1f5f9;
+            color: #333;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Input Area */
+        #chat-input-area {
+            display: flex;
+            padding: 12px;
+            background: white;
+            border-top: 1px solid #eee;
+        }
+
+        #chat-input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 20px;
+            outline: none;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        #chat-input:focus {
+            border-color: #4f46e5;
+        }
+
+        #send-btn {
+            margin-left: 10px;
+            padding: 10px 16px;
+            background: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+        #send-btn:hover {
+            background: #4338ca;
+        }
+    </style>
 </head>
 
 <body>
-  <a-scene>
+    <!-- 2D UI Overlay -->
+    <div id="chat-container">
+        <div id="chat-header">Talk to Jackyboi</div>
+        <div id="chat-messages">
+            <div class="message bot-message">Hey there! It's me, Jackyboi. How's it going?</div>
+        </div>
+        <div id="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Type a message..." autocomplete="off">
+            <button id="send-btn">Send</button>
+        </div>
+    </div>
 
-    <a-sky color="purple"></a-sky>
-    <a-box position="-1 -0.5 -3" rotation="0 45 0" color="#4CC3D9"></a-box>
-    <a-sphere position="0 0.25 -5" radius="1.25" color="#EF2D5E"></a-sphere>
-    <a-cylinder position="1 -0.25 -3" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
-    <a-plane position="0 -1 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4"></a-plane>
-    
-    <a-image src="https://raw.githubusercontent.com/alluringxstalwart/SourceYISL/main/Landscape.png" position="0 5 -10"
-      width="25" height="7.5"></a-image>
-    
-    <a-text value="Young Innovators STEM Lab" position="0 9.5 -10" align="center" color="white" font="mozillavr"
-      width="10" height="5" anchor="center">
-    </a-text>
+    <!-- 3D Scene Layer -->
+    <a-scene environment="preset: forest; skyType: gradient; lighting: point">
+        <a-assets>
+            <a-asset-item id="jackyboi-model" src="jackyboi.glb"></a-asset-item>
+        </a-assets>
 
+        <!-- Model playing the sit animation -->
+        <a-gltf-model src="#jackyboi-model" position="0 0 -3"
+            animation-mixer="clip: sit; loop: repeat; crossFadeDuration: 0.3"></a-gltf-model>
 
-  </a-scene>
+        <!-- 3D Comic Speech Bubble Anchor -->
+        <a-entity id="speech-bubble" position="0 2.2 -3" visible="true">
+            <!-- The white bubble background -->
+            <a-plane color="white" width="2" height="0.8" opacity="0.95" position="0 0 0" class="raycastable"
+                material="shader: flat"></a-plane>
+
+            <!-- The text inside the bubble -->
+            <a-text id="speech-text" value="Hey there! It's me, Jackyboi. How's it going?" color="black" align="center"
+                position="0 0 0.01" width="1.8" wrap-count="20" baseline="center">
+            </a-text>
+
+            <!-- The tail pointing to the character -->
+            <a-triangle color="white" opacity="0.95" vertex-a="0 0 0" vertex-b="0.3 0 0" vertex-c="0.1 -0.5 0"
+                position="-0.2 -0.4 0.005" material="shader: flat">
+            </a-triangle>
+        </a-entity>
+
+        <!-- Camera Controller -->
+        <a-entity position="0 1.6 0">
+            <a-camera look-controls="pointerLockEnabled: false"></a-camera>
+        </a-entity>
+    </a-scene>
+
+    <script>
+        const chatInput = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('send-btn');
+        const chatMessages = document.getElementById('chat-messages');
+        const speechBubble = document.getElementById('speech-bubble');
+        const speechText = document.getElementById('speech-text');
+
+        let hideBubbleTimeout;
+
+        // Ensure the chat doesn't capture VR inputs maliciously
+        chatInput.addEventListener('keydown', (e) => {
+            e.stopPropagation();
+        });
+
+        function addMessageToUI(sender, text) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${sender === 'user' ? 'user-message' : 'bot-message'}`;
+            msgDiv.textContent = text;
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function update3DSpeechBubble(text) {
+            // Clear previous timeout to keep bubble visible
+            if (hideBubbleTimeout) clearTimeout(hideBubbleTimeout);
+
+            speechBubble.setAttribute('visible', 'true');
+            speechText.setAttribute('value', text);
+
+            // Slightly scale up the text if it's very short, or keep it standard
+            const txtLength = text.length;
+            if (txtLength < 10) {
+                speechText.setAttribute('width', '1');
+                document.querySelector('#speech-bubble a-plane').setAttribute('width', '1.2');
+            } else {
+                speechText.setAttribute('width', '1.8');
+                document.querySelector('#speech-bubble a-plane').setAttribute('width', '2');
+            }
+
+            // Hide bubble after 5 seconds of inactivity
+            hideBubbleTimeout = setTimeout(() => {
+                speechBubble.setAttribute('visible', 'false');
+            }, 5000);
+        }
+
+        function handleSendMessage() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            // 1. Show user message in UI
+            addMessageToUI('user', text);
+
+            // Clear input field
+            chatInput.value = '';
+
+            // 2. Simulate network delay and bot reply
+            setTimeout(() => {
+                const replies = [
+                    "Huh, interesting!",
+                    "I'm just sitting here in this forest.",
+                    "Wow, really?!",
+                    `You said: "${text}". That's cool.`,
+                    "Nice to meet you!"
+                ];
+                const randomReply = replies[Math.floor(Math.random() * replies.length)];
+
+                // Show bot message in UI
+                addMessageToUI('bot', randomReply);
+
+                // Show bot message in 3D scene comic bubble
+                update3DSpeechBubble(randomReply);
+
+            }, 800 + Math.random() * 1000); // Random delay between 0.8s and 1.8s
+        }
+
+        // Hide bubble initially after a few seconds
+        hideBubbleTimeout = setTimeout(() => {
+            speechBubble.setAttribute('visible', 'false');
+        }, 5000);
+
+        // Event Listeners for Chat
+        sendBtn.addEventListener('click', handleSendMessage);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleSendMessage();
+        });
+    </script>
 </body>
 
 </html>
